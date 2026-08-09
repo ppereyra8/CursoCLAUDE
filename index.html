@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Curso · Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #2B2A28;
+    --panel: #34322E;
+    --panel-hover: #3E3B36;
+    --line: #46433D;
+    --ink: #EDE7DA;
+    --ink-dim: #B8AFA0;
+    --paper: #EDE7DA;
+    --paper-dim: #E2DCCC;
+    --paper-ink: #2B2A28;
+    --paper-ink-dim: #6B6558;
+    --teal: #5C8A7E;
+    --teal-dim: #3F6459;
+    --amber: #C98A3D;
+    --amber-dim: #9C6B2E;
+    --radius: 3px;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Space Grotesk', sans-serif;
+    --serif: 'Source Serif 4', serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--serif);
+    display:flex;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--amber); color:var(--bg); }
+
+  /* ---------- SIDEBAR ---------- */
+  #sidebar{
+    width:340px;
+    min-width:340px;
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    position:sticky;
+    top:0;
+  }
+  #sb-head{
+    padding:22px 20px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  #sb-head .prompt{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--teal);
+    letter-spacing:.02em;
+  }
+  #sb-head h1{
+    font-family:var(--display);
+    font-size:20px;
+    font-weight:600;
+    margin-top:6px;
+    letter-spacing:-0.01em;
+  }
+  #progress-wrap{
+    padding:14px 20px;
+    border-bottom:1px solid var(--line);
+  }
+  #progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-dim);
+    margin-bottom:7px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  #progress-track{
+    height:5px;
+    background:var(--line);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  #progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--teal-dim), var(--teal));
+    width:0%;
+    transition:width .4s ease;
+  }
+  #tree{
+    flex:1;
+    overflow-y:auto;
+    padding:10px 8px 24px;
+  }
+  #tree::-webkit-scrollbar{width:8px;}
+  #tree::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px;}
+
+  .folder{margin-bottom:2px;}
+  .folder-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 10px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    user-select:none;
+    font-family:var(--display);
+    font-weight:500;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .folder-head:hover{ background:var(--panel-hover); }
+  .caret{
+    font-family:var(--mono);
+    color:var(--teal);
+    font-size:11px;
+    width:10px;
+    display:inline-block;
+    transition:transform .15s ease;
+  }
+  .folder.open > .folder-head .caret{ transform:rotate(90deg); }
+  .folder-count{
+    margin-left:auto;
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--ink-dim);
+    background:var(--bg);
+    padding:2px 6px;
+    border-radius:99px;
+  }
+  .folder-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .25s ease;
+    padding-left:14px;
+    border-left:1px solid var(--line);
+    margin-left:19px;
+  }
+  .folder.open > .folder-body{ max-height:1200px; }
+
+  .lesson{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:8px 10px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    font-size:13px;
+    color:var(--ink-dim);
+  }
+  .lesson:hover{ background:var(--panel-hover); color:var(--ink); }
+  .lesson.active{ background:var(--teal-dim); color:var(--ink); }
+  .lesson .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--line);
+    flex:none;
+  }
+  .lesson.done .dot{ background:var(--amber); }
+  .lesson .ltitle{ flex:1; line-height:1.3; }
+  .lesson .ldur{
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--ink-dim);
+    flex:none;
+  }
+  .tag{
+    font-family:var(--mono);
+    font-size:9px;
+    font-weight:600;
+    letter-spacing:.03em;
+    padding:2px 5px;
+    border-radius:2px;
+    flex:none;
+  }
+  .tag.mp4{ background:#3F6459; color:#CFE8DE; }
+  .tag.yt{ background:#7A3A3A; color:#F0D4CE; }
+  .tag.pdf{ background:#6B4A2A; color:#F0DCC0; }
+  .tag.json{ background:#4A4A6B; color:#DCDCF0; }
+  .tag.xlsx{ background:#3D5A3D; color:#D6ECD6; }
+  .tag.html{ background:#6B3A4A; color:#F0D4DC; }
+  .subgroup-label{
+    font-family:var(--mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--ink-dim);
+    padding:10px 10px 4px;
+  }
+
+  /* ---------- MAIN ---------- */
+  #main{
+    flex:1;
+    min-width:0;
+    background:var(--paper);
+    color:var(--paper-ink);
+  }
+  #main-inner{
+    max-width:880px;
+    margin:0 auto;
+    padding:56px 48px 100px;
+  }
+  #eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--teal-dim);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+  #lesson-title{
+    font-family:var(--display);
+    font-size:34px;
+    font-weight:600;
+    letter-spacing:-0.015em;
+    line-height:1.15;
+    margin-bottom:10px;
+  }
+  #lesson-meta{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--paper-ink-dim);
+    margin-bottom:28px;
+    display:flex;
+    gap:14px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  #mark-done{
+    font-family:var(--mono);
+    font-size:12px;
+    border:1px solid var(--paper-ink-dim);
+    background:transparent;
+    color:var(--paper-ink);
+    padding:6px 12px;
+    border-radius:99px;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  #mark-done:hover{ border-color:var(--teal-dim); color:var(--teal-dim); }
+  #mark-done.on{ background:var(--amber); border-color:var(--amber); color:#2B2A28; }
+
+  #player-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    background:#1C1B19;
+    border-radius:6px;
+    overflow:hidden;
+    margin-bottom:8px;
+  }
+  #player-wrap iframe{
+    width:100%; height:100%; border:0;
+  }
+  #player-placeholder{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:10px;
+    color:#8B8578;
+    font-family:var(--mono);
+    font-size:12px;
+    text-align:center;
+    padding:20px;
+  }
+  #player-placeholder code{
+    background:#2B2A28;
+    padding:2px 6px;
+    border-radius:3px;
+    color:var(--amber);
+  }
+  #edit-hint{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--paper-ink-dim);
+    margin-bottom:36px;
+  }
+
+  #desc{
+    font-size:16px;
+    line-height:1.7;
+    color:var(--paper-ink);
+    margin-bottom:36px;
+  }
+  #desc.empty{ color:var(--paper-ink-dim); font-style:italic; }
+
+  #materials{
+    border-top:1px solid var(--paper-dim);
+    padding-top:26px;
+  }
+  #materials h2{
+    font-family:var(--display);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--paper-ink-dim);
+    margin-bottom:14px;
+  }
+  .material{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    background:var(--paper-dim);
+    border-radius:6px;
+    margin-bottom:8px;
+    text-decoration:none;
+    color:var(--paper-ink);
+    transition:.15s ease;
+  }
+  .material:hover{ background:#D9D2BE; }
+  .material .mname{
+    flex:1;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .material .marrow{
+    font-family:var(--mono);
+    color:var(--teal-dim);
+    font-size:13px;
+  }
+
+  #home-view{ display:none; }
+  #home-view.show{ display:block; }
+  #lesson-view.hide{ display:none; }
+  #home-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+    gap:14px;
+    margin-top:30px;
+  }
+  .home-card{
+    background:var(--paper-dim);
+    border-radius:8px;
+    padding:20px;
+    cursor:pointer;
+    transition:.15s ease;
+    border:1px solid transparent;
+  }
+  .home-card:hover{ border-color:var(--teal-dim); transform:translateY(-2px); }
+  .home-card .hc-eyebrow{
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--teal-dim);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-bottom:8px;
+  }
+  .home-card h3{
+    font-family:var(--display);
+    font-size:17px;
+    font-weight:600;
+    margin-bottom:6px;
+    line-height:1.25;
+  }
+  .home-card p{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--paper-ink-dim);
+  }
+  #root-files{
+    margin-top:28px;
+    padding-top:24px;
+    border-top:1px solid var(--paper-dim);
+  }
+
+  @media (max-width: 860px){
+    body{ flex-direction:column; }
+    #sidebar{ position:relative; height:auto; width:100%; min-width:0; max-height:60vh; }
+    #main-inner{ padding:32px 20px 80px; }
+    #lesson-title{ font-size:26px; }
+  }
+
+  a:focus-visible, button:focus-visible, .lesson:focus-visible, .folder-head:focus-visible, .home-card:focus-visible{
+    outline:2px solid var(--teal);
+    outline-offset:2px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="sidebar" aria-label="Índice del curso">
+  <div id="sb-head">
+    <div class="prompt">~/curso $ ls</div>
+    <h1>Mi Curso</h1>
+  </div>
+  <div id="progress-wrap">
+    <div id="progress-label"><span>Progreso</span><span id="progress-pct">0%</span></div>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+  </div>
+  <div id="tree"></div>
+</nav>
+
+<main id="main">
+  <div id="main-inner">
+
+    <div id="home-view" class="show">
+      <div id="eyebrow">Panel</div>
+      <div id="lesson-title" style="font-size:34px;">Bienvenida de nuevo</div>
+      <div id="lesson-meta">Elegí un módulo del panel izquierdo para arrancar, o mirá los archivos generales acá abajo.</div>
+      <div id="home-grid"></div>
+      <div id="root-files">
+        <h2 style="font-family:var(--display); font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--paper-ink-dim); margin-bottom:14px;">Archivos generales</h2>
+        <div id="root-files-list"></div>
+      </div>
+    </div>
+
+    <div id="lesson-view" class="hide">
+      <div id="eyebrow"></div>
+      <div id="lesson-title"></div>
+      <div id="lesson-meta">
+        <span id="meta-dur"></span>
+        <button id="mark-done">Marcar como vista</button>
+      </div>
+
+      <div id="player-wrap"></div>
+      <div id="edit-hint"></div>
+
+      <div id="desc"></div>
+
+      <div id="materials">
+        <h2>Materiales</h2>
+        <div id="materials-list"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN DEL CURSO
+   -----------------------------------------------------------------
+   Acá se edita TODO el contenido. No hace falta tocar el resto del
+   archivo para agregar links, videos o materiales.
+
+   Para un video de Google Drive:
+     type: "drive"
+     driveId: el ID que aparece en el link para compartir
+              (https://drive.google.com/file/d/ESTE_ES_EL_ID/view)
+
+   Para un video de YouTube:
+     type: "youtube"
+     youtubeId: el ID del video
+              (https://www.youtube.com/watch?v=ESTE_ES_EL_ID)
+
+   Para materiales (PDF, JSON, XLSX, HTML, etc.):
+     Poné el archivo dentro de la carpeta /materiales/... de tu repo
+     de GitHub y usá esa ruta relativa en "file".
+   ===================================================================== */
+
+const COURSE = {
+  rootFiles: [
+    { name: "LEER ESTO PRIMERO", type:"pdf", file:"materiales/LEER-ESTO-PRIMERO.pdf" }
+  ],
+
+  folders: [
+    {
+      id: "c1",
+      name: "Curso 1",
+      lessons: [
+        { id:"c1-1", title:"Clase 1", dur:"17:40", type:"drive", driveId:"PEGAR_ID_DRIVE_1", materials:[] },
+        { id:"c1-2", title:"Clase 2", dur:"21:37", type:"drive", driveId:"PEGAR_ID_DRIVE_2", materials:[] },
+        { id:"c1-3", title:"Clase 3", dur:"22:42", type:"drive", driveId:"PEGAR_ID_DRIVE_3", materials:[] },
+        { id:"c1-4", title:"Clase 4", dur:"08:46", type:"drive", driveId:"PEGAR_ID_DRIVE_4", materials:[] },
+        { id:"c1-5", title:"Clase 5", dur:"11:51", type:"drive", driveId:"PEGAR_ID_DRIVE_5", materials:[] },
+        { id:"c1-6", title:"Clase 6", dur:"07:46", type:"drive", driveId:"PEGAR_ID_DRIVE_6", materials:[] },
+        { id:"c1-7", title:"Clase 7", dur:"05:20", type:"drive", driveId:"PEGAR_ID_DRIVE_7", materials:[] },
+        { id:"c1-8", title:"Clase 8", dur:"09:04", type:"drive", driveId:"PEGAR_ID_DRIVE_8", materials:[] }
+      ]
+    },
+    {
+      id: "c2",
+      name: "Curso 2 · YouTube",
+      lessons: [
+        { id:"c2-1", title:"Claude Code 2026 · Curso Completo en Español", dur:"", type:"youtube", youtubeId:"h49d1-d_fYk", materials:[] }
+      ]
+    },
+    {
+      id: "c3",
+      name: "Curso 3 - Actualizaciones",
+      lessons: [
+        { id:"c3-0", title:"0 - Curso Claude Code", dur:"1:32:23", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_0", materials:[] },
+        { id:"c3-1", title:"1 - Claude Memory 2.0", dur:"21:12", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_1", materials:[] },
+        { id:"c3-2", title:"2 - Diseño Web con Stitch 2.0", dur:"26:39", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_2", materials:[] },
+        { id:"c3-3", title:"3 - 7 Skills de Claude Code Brutales Para Automatizar Todo", dur:"26:05", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_3", materials:[] },
+        { id:"c3-4", title:"4 - Agentes de IA Claude", dur:"32:22", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_4", materials:[] },
+        { id:"c3-5", title:"5 - Nuevos Agentes de IA", dur:"22:54", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_5", materials:[] },
+        { id:"c3-6", title:"6 - Automatiza todo con Claude", dur:"23:26", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_6", materials:[] },
+        { id:"c3-7", title:"7 - Cowork Projects", dur:"11:54", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_7", materials:[] },
+        { id:"c3-8", title:"8 - Usar Claude Gratis", dur:"14:47", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_8", materials:[] },
+        { id:"c3-9", title:"9 - Agentes de IA en Claude Code Tienen Vida Propia (Se Mueven)", dur:"32:22", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_9", materials:[] },
+        { id:"c3-10", title:"10 - Anthropic Lanza Routines en Claude Code y Automatiza Todo", dur:"", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_10", materials:[] },
+        { id:"c3-11", title:"11 - Claude x Capcut Modo Dios (edita así tus vídeos)", dur:"", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_11", materials:[] },
+        { id:"c3-12", title:"12 - Claude Code Lanza el Nuevo Agent View (Agentes de IA Ilimitados)", dur:"", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_12", materials:[] },
+        { id:"c3-13", title:"13 - Claude Acaba de Filtrar 5 Funciones Brutales (Kairos, UltraPlan...)", dur:"", type:"drive", driveId:"PEGAR_ID_DRIVE_c3_13", materials:[] }
+      ],
+      /* Subcarpeta con plantillas y archivos de ejemplo (json / xlsx / html).
+         Cambiá los nombres y rutas por los reales cuando subas los archivos
+         a /materiales/curso3-plantillas/ en tu repo. */
+      subgroup: {
+        label: "Plantillas Juan Pe Navarro",
+        materials: [
+          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/ejemplo-plantilla.json" },
+          { name:"ejemplo-plantilla.xlsx", type:"xlsx", file:"materiales/curso3-plantillas/ejemplo-plantilla.xlsx" },
+          { name:"ejemplo-plantilla.html", type:"html", file:"materiales/curso3-plantillas/ejemplo-plantilla.html" }
+        ]
+      }
+    },
+    {
+      id: "c4",
+      name: "Curso 4 - Claude + Meta Ads",
+      lessons: [
+        {
+          id:"c4-1", title:"Claude Code en Meta Ads · Método Seguro para Analizar tus Campañas",
+          dur:"59:10", type:"drive", driveId:"PEGAR_ID_DRIVE_c4",
+          materials:[ { name:"Guía para conectarlo.pdf", type:"pdf", file:"materiales/curso4/guia-para-conectarlo.pdf" } ]
+        }
+      ]
+    },
+    {
+      id: "c5",
+      name: "Curso 5 - Claude + Higgsfield",
+      lessons: [
+        {
+          id:"c5-1", title:"Higgsfield Convirtió a Claude en Una Agencia de Publicidad",
+          dur:"33:34", type:"drive", driveId:"PEGAR_ID_DRIVE_c5",
+          materials:[ { name:"Guía para conectarlo.pdf", type:"pdf", file:"materiales/curso5/guia-para-conectarlo.pdf" } ]
+        }
+      ]
+    }
+  ]
+};
+
+/* ===================== fin de la configuración ===================== */
+
+
+const STORAGE_KEY = "mi-curso-progreso";
+function loadDone(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveDone(done){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(done));
+}
+let done = loadDone();
+
+function allLessons(){
+  return COURSE.folders.flatMap(f => f.lessons);
+}
+
+function updateProgress(){
+  const all = allLessons();
+  const total = all.length;
+  const completed = all.filter(l => done[l.id]).length;
+  const pct = total ? Math.round((completed/total)*100) : 0;
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("progress-pct").textContent = pct + "%";
+}
+
+function tagFor(type){
+  const map = { drive:"mp4", youtube:"yt", pdf:"pdf", json:"json", xlsx:"xlsx", html:"html" };
+  const cls = map[type] || "mp4";
+  const label = cls.toUpperCase();
+  return `<span class="tag ${cls}">${label}</span>`;
+}
+
+function renderTree(){
+  const tree = document.getElementById("tree");
+  tree.innerHTML = "";
+  COURSE.folders.forEach(folder => {
+    const div = document.createElement("div");
+    div.className = "folder";
+    div.dataset.folder = folder.id;
+
+    const head = document.createElement("div");
+    head.className = "folder-head";
+    head.tabIndex = 0;
+    head.innerHTML = `<span class="caret">▸</span><span>${folder.name}</span><span class="folder-count">${folder.lessons.length}</span>`;
+    head.addEventListener("click", () => div.classList.toggle("open"));
+    head.addEventListener("keydown", e => { if(e.key==="Enter" || e.key===" "){ e.preventDefault(); div.classList.toggle("open"); }});
+
+    const body = document.createElement("div");
+    body.className = "folder-body";
+
+    folder.lessons.forEach(lesson => {
+      const item = document.createElement("div");
+      item.className = "lesson" + (done[lesson.id] ? " done" : "");
+      item.tabIndex = 0;
+      item.dataset.lessonId = lesson.id;
+      item.innerHTML = `
+        <span class="dot"></span>
+        ${tagFor(lesson.type)}
+        <span class="ltitle">${lesson.title}</span>
+        <span class="ldur">${lesson.dur || ""}</span>
+      `;
+      item.addEventListener("click", () => openLesson(folder, lesson));
+      item.addEventListener("keydown", e => { if(e.key==="Enter"){ openLesson(folder, lesson); }});
+      body.appendChild(item);
+    });
+
+    if(folder.subgroup){
+      const label = document.createElement("div");
+      label.className = "subgroup-label";
+      label.textContent = "📁 " + folder.subgroup.label;
+      body.appendChild(label);
+
+      folder.subgroup.materials.forEach(m => {
+        const a = document.createElement("a");
+        a.className = "lesson";
+        a.href = m.file;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.innerHTML = `<span class="dot"></span>${tagFor(m.type)}<span class="ltitle">${m.name}</span>`;
+        body.appendChild(a);
+      });
+    }
+
+    div.appendChild(head);
+    div.appendChild(body);
+    tree.appendChild(div);
+  });
+}
+
+function renderHome(){
+  const grid = document.getElementById("home-grid");
+  grid.innerHTML = "";
+  COURSE.folders.forEach(folder => {
+    const doneCount = folder.lessons.filter(l => done[l.id]).length;
+    const card = document.createElement("div");
+    card.className = "home-card";
+    card.tabIndex = 0;
+    card.innerHTML = `
+      <div class="hc-eyebrow">${folder.lessons.length} clase${folder.lessons.length===1?"":"s"}</div>
+      <h3>${folder.name}</h3>
+      <p>${doneCount}/${folder.lessons.length} vistas</p>
+    `;
+    card.addEventListener("click", () => {
+      const el = document.querySelector(`.folder[data-folder="${folder.id}"]`);
+      el.classList.add("open");
+      openLesson(folder, folder.lessons[0]);
+      el.scrollIntoView({block:"nearest"});
+    });
+    grid.appendChild(card);
+  });
+
+  const rootList = document.getElementById("root-files-list");
+  rootList.innerHTML = "";
+  COURSE.rootFiles.forEach(f => {
+    const a = document.createElement("a");
+    a.className = "material";
+    a.href = f.file;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.innerHTML = `${tagFor(f.type)}<span class="mname">${f.name}</span><span class="marrow">abrir →</span>`;
+    rootList.appendChild(a);
+  });
+}
+
+function openLesson(folder, lesson){
+  document.getElementById("home-view").classList.remove("show");
+  document.getElementById("lesson-view").classList.remove("hide");
+
+  document.querySelectorAll(".lesson").forEach(el => el.classList.remove("active"));
+  const activeEl = document.querySelector(`.lesson[data-lesson-id="${lesson.id}"]`);
+  if(activeEl) activeEl.classList.add("active");
+
+  document.getElementById("eyebrow").textContent = folder.name;
+  document.getElementById("lesson-title").textContent = lesson.title;
+  document.getElementById("meta-dur").textContent = lesson.dur ? ("Duración " + lesson.dur) : "";
+
+  const markBtn = document.getElementById("mark-done");
+  markBtn.classList.toggle("on", !!done[lesson.id]);
+  markBtn.textContent = done[lesson.id] ? "Vista ✓" : "Marcar como vista";
+  markBtn.onclick = () => {
+    done[lesson.id] = !done[lesson.id];
+    saveDone(done);
+    markBtn.classList.toggle("on", !!done[lesson.id]);
+    markBtn.textContent = done[lesson.id] ? "Vista ✓" : "Marcar como vista";
+    activeEl && activeEl.classList.toggle("done", !!done[lesson.id]);
+    updateProgress();
+    renderHome();
+  };
+
+  const playerWrap = document.getElementById("player-wrap");
+  const editHint = document.getElementById("edit-hint");
+  if(lesson.type === "youtube"){
+    playerWrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${lesson.youtubeId}" title="${lesson.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    editHint.textContent = "";
+  } else if(lesson.type === "drive"){
+    if(lesson.driveId && lesson.driveId.startsWith("PEGAR_ID_DRIVE")){
+      playerWrap.innerHTML = `<div id="player-placeholder">Todavía no pegaste el link de Drive para esta clase.<br>Buscá <code>${lesson.driveId}</code> en el archivo y reemplazalo por el ID real.</div>`;
+    } else {
+      playerWrap.innerHTML = `<iframe src="https://drive.google.com/file/d/${lesson.driveId}/preview" title="${lesson.title}" allow="autoplay" allowfullscreen></iframe>`;
+    }
+    editHint.textContent = "";
+  }
+
+  const desc = document.getElementById("desc");
+  desc.textContent = "";
+  desc.classList.add("empty");
+
+  const matList = document.getElementById("materials-list");
+  matList.innerHTML = "";
+  const mats = lesson.materials || [];
+  if(mats.length === 0){
+    document.getElementById("materials").style.display = "none";
+  } else {
+    document.getElementById("materials").style.display = "block";
+    mats.forEach(m => {
+      const a = document.createElement("a");
+      a.className = "material";
+      a.href = m.file;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.innerHTML = `${tagFor(m.type)}<span class="mname">${m.name}</span><span class="marrow">abrir →</span>`;
+      matList.appendChild(a);
+    });
+  }
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function goHome(){
+  document.getElementById("home-view").classList.add("show");
+  document.getElementById("lesson-view").classList.add("hide");
+  document.querySelectorAll(".lesson").forEach(el => el.classList.remove("active"));
+}
+
+document.getElementById("sb-head").addEventListener("click", goHome);
+document.getElementById("sb-head").style.cursor = "pointer";
+
+renderTree();
+renderHome();
+updateProgress();
+</script>
+</body>
+</html>
