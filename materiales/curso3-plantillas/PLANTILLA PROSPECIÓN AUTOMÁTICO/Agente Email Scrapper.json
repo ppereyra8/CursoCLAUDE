@@ -430,7 +430,7 @@
           "parameters": [
             {
               "name": "X-Goog-Api-Key",
-              "value": "AIzaSyCJDtDB9iyqJC_dHIDT63c_8fAodZ3Az4o"
+              "value": "TU_API_KEY_AQUI"
             },
             {
               "name": "X-Goog-FieldMask",
