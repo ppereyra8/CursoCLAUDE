@@ -390,8 +390,7 @@
 
 <nav id="sidebar" aria-label="Índice del curso">
   <div id="sb-head">
-    <div class="prompt">~/curso $ ls</div>
-    <h1>Mi Curso</h1>
+    <h1>CURSO CLAUDE</h1>
   </div>
   <div id="progress-wrap">
     <div id="progress-label"><span>Progreso</span><span id="progress-pct">0%</span></div>
@@ -405,11 +404,11 @@
 
     <div id="home-view" class="show">
       <div id="eyebrow">Panel</div>
-      <div id="lesson-title" style="font-size:34px;">Bienvenida de nuevo</div>
+      <div id="lesson-title" style="font-size:34px;">Bienvenido!</div>
       <div id="lesson-meta">Elegí un módulo del panel izquierdo para arrancar, o mirá los archivos generales acá abajo.</div>
       <div id="home-grid"></div>
       <div id="root-files">
-        <h2 style="font-family:var(--display); font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--paper-ink-dim); margin-bottom:14px;">Archivos generales</h2>
+        <h2 style="font-family:var(--display); font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--paper-ink-dim); margin-bottom:14px;">Archivo de Bienvenida</h2>
         <div id="root-files-list"></div>
       </div>
     </div>
@@ -465,7 +464,7 @@
 
 const COURSE = {
   rootFiles: [
-    { name: "LEER ESTO PRIMERO", type:"pdf", file:"materiales/LEER-ESTO-PRIMERO.pdf" }
+    { name: "BIENVENIDA", type:"pdf", file:"materiales/BIENVENIDA.pdf" }
   ],
 
   folders: [
@@ -487,7 +486,7 @@ const COURSE = {
       id: "c2",
       name: "Curso 2 · YouTube",
       lessons: [
-        { id:"c2-1", title:"Claude Code 2026 · Curso Completo en Español", dur:"", type:"youtube", youtubeId:"h49d1-d_fYk&t=3s", materials:[] }
+        { id:"c2-1", title:"Claude Code 2026 · Curso Completo en Español", dur:"", type:"youtube", youtubeId:"h49d1-d_fYk", materials:[] }
       ]
     },
     {
@@ -515,22 +514,22 @@ const COURSE = {
       subgroup: {
         label: "Plantillas Juan Pe Navarro",
         materials: [
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/OPENCLAW/guia_openclaw_hostinger_v4.pdf" },
+          { name:"guia_openclaw_hostinger_v4.pdf", type:"pdf", file:"materiales/curso3-plantillas/OPENCLAW/guia_openclaw_hostinger_v4.pdf" },
 
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA HOLAMUNDO/HOLA MUNDO N8N.json" },
+          { name:"PLANTILLA HOLAMUNDO/HOLA MUNDO N8N.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA HOLAMUNDO/HOLA MUNDO N8N.json" },
 
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA PROSPECIÓN AUTOMÁTICO/Agente Icebreaker.json" },
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA PROSPECIÓN AUTOMÁTICO/LEAD SCRAPPING CONTROL.xlsx" },
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA PROSPECIÓN AUTOMÁTICO/Agente Email Scrapper.json" },
+          { name:"Agente Icebreaker.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA PROSPECIÓN AUTOMÁTICO/Agente Icebreaker.json" },
+          { name:"LEAD SCRAPPING CONTROL.xlsx", type:"xlsx", file:"materiales/curso3-plantillas/PLANTILLA PROSPECIÓN AUTOMÁTICO/LEAD SCRAPPING CONTROL.xlsx" },
+          { name:"Agente Email Scrapper.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA PROSPECIÓN AUTOMÁTICO/Agente Email Scrapper.json" },
 
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA RECEPCIONISTA/Clínica Dental - Recepcionista WhatsApp.json" },
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA RECEPCIONISTA/Clínica Dental - Recordatorios Automáticos.json" },
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA RECEPCIONISTA/CONTROL CITAS DENTISTA.xlsx" },
+          { name:"Clínica Dental - Recepcionista WhatsApp.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA RECEPCIONISTA/Clínica Dental - Recepcionista WhatsApp.json" },
+          { name:"Clínica Dental - Recordatorios Automáticos.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA RECEPCIONISTA/Clínica Dental - Recordatorios Automáticos.json" },
+          { name:"CONTROL CITAS DENTISTA.xlsx", type:"xlsx", file:"materiales/curso3-plantillas/PLANTILLA RECEPCIONISTA/CONTROL CITAS DENTISTA.xlsx" },
 
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA REDES SOCIALES/Gestor de Redes Sociales.json" },
+          { name:"Gestor de Redes Sociales.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA REDES SOCIALES/Gestor de Redes Sociales.json" },
           
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA VIDEO VIRALES/Video Virales - Control.xlsx" },
-          { name:"ejemplo-plantilla.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA VIDEO VIRALES/Generador de Videos Virales + Copies IA + Publicación Auto.json" }
+          { name:"Video Virales - Control.xlsx", type:"xlsx", file:"materiales/curso3-plantillas/PLANTILLA VIDEO VIRALES/Video Virales - Control.xlsx" },
+          { name:"Generador de Videos Virales + Copies IA + Publicación Auto.json", type:"json", file:"materiales/curso3-plantillas/PLANTILLA VIDEO VIRALES/Generador de Videos Virales + Copies IA + Publicación Auto.json" }
           
           
         ]
@@ -543,7 +542,7 @@ const COURSE = {
         {
           id:"c4-1", title:"Claude Code en Meta Ads · Método Seguro para Analizar tus Campañas",
           dur:"59:10", type:"drive", driveId:"1ZKzUY5zEIvf8E8WPw9zraCblVSEMjUL8",
-          materials:[ { name:"Guía para conectarlo.pdf", type:"pdf", file:"materiales/curso4/guia-para-conectarlo.pdf" } ]
+          materials:[ { name:"GUIA PARA CONECTARLO.pdf", type:"pdf", file:"materiales/curso4/GUIA PARA CONECTARLO.pdf" } ]
         }
       ]
     },
@@ -554,7 +553,7 @@ const COURSE = {
         {
           id:"c5-1", title:"Higgsfield Convirtió a Claude en Una Agencia de Publicidad",
           dur:"33:34", type:"drive", driveId:"1qEzxMLqr3Clf8sWm0ym1J7eW87kI0qQE",
-          materials:[ { name:"Guía para conectarlo.pdf", type:"pdf", file:"materiales/curso5/guia-para-conectarlo.pdf" } ]
+          materials:[ { name:"GUIA PARA CONECTARLO.pdf", type:"pdf", file:"materiales/curso5/GUIA PARA CONECTARLO.pdf" } ]
         }
       ]
     }
